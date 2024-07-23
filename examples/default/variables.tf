@@ -13,11 +13,6 @@ variable "domain_admin_user" {
   description = "The username of the domain account."
 }
 
-variable "local_admin_password" {
-  type        = string
-  description = "The password of the local administrator account."
-}
-
 variable "private_ip" {
   type        = string
   description = "value of private ip"

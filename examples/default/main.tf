@@ -5,10 +5,6 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 3.74"
     }
-    modtm = {
-      source  = "azure/modtm"
-      version = "~> 0.3"
-    }
     random = {
       source  = "hashicorp/random"
       version = "~> 3.5"
@@ -60,7 +56,7 @@ module "test" {
   resource_group_name = azurerm_resource_group.rg.name
 
   enable_telemetry = var.enable_telemetry # see variables.tf
-  // Beginning of specific varible for virtual environment
+  # Beginning of specific varible for virtual environment
   dc_port         = 6985
   virtual_host_ip = var.private_ip
 

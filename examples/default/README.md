@@ -11,10 +11,6 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 3.74"
     }
-    modtm = {
-      source  = "azure/modtm"
-      version = "~> 0.3"
-    }
     random = {
       source  = "hashicorp/random"
       version = "~> 3.5"
@@ -66,7 +62,7 @@ module "test" {
   resource_group_name = azurerm_resource_group.rg.name
 
   enable_telemetry = var.enable_telemetry # see variables.tf
-  // Beginning of specific varible for virtual environment
+  # Beginning of specific varible for virtual environment
   dc_port         = 6985
   virtual_host_ip = var.private_ip
 
@@ -89,8 +85,6 @@ The following requirements are needed by this module:
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.5)
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 3.74)
-
-- <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.5)
 
@@ -121,12 +115,6 @@ Type: `string`
 ### <a name="input_domain_admin_user"></a> [domain\_admin\_user](#input\_domain\_admin\_user)
 
 Description: The username of the domain account.
-
-Type: `string`
-
-### <a name="input_local_admin_password"></a> [local\_admin\_password](#input\_local\_admin\_password)
-
-Description: The password of the local administrator account.
 
 Type: `string`
 
