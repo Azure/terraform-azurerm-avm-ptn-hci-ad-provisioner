@@ -7,7 +7,10 @@ Things to do:
 
 1. Set up a GitHub repo environment called `test`.
 1. Configure environment protection rule to ensure that approval is required before deploying to this environment.
-1. Install Docker Desktop to run tests
+1. Create a user-assigned managed identity in your test subscription.
+1. Create a role assignment for the managed identity on your test subscription, use the minimum required role.
+1. Configure federated identity credentials on the user assigned managed identity. Use the GitHub environment.
+1. Search and update TODOs within the code and remove the TODO comments once complete.
 
 > [!IMPORTANT]
 > As the overall AVM framework is not GA (generally available) yet - the CI framework and test automation is not fully functional and implemented across all supported languages yet - breaking changes are expected, and additional customer feedback is yet to be gathered and incorporated. Hence, modules **MUST NOT** be published at version `1.0.0` or higher at this time.
@@ -29,16 +32,6 @@ The following requirements are needed by this module:
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.5)
 
-## Providers
-
-The following providers are used by this module:
-
-- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (~> 3.71)
-
-- <a name="provider_modtm"></a> [modtm](#provider\_modtm) (~> 0.3)
-
-- <a name="provider_random"></a> [random](#provider\_random) (~> 3.5)
-
 ## Resources
 
 The following resources are used by this module:
@@ -47,10 +40,11 @@ The following resources are used by this module:
 - [azurerm_private_endpoint.this_managed_dns_zone_groups](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
 - [azurerm_private_endpoint.this_unmanaged_dns_zone_groups](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
 - [azurerm_private_endpoint_application_security_group_association.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint_application_security_group_association) (resource)
-- [azurerm_resource_group.TODO](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
 - [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/azure/modtm/latest/docs/resources/telemetry) (resource)
 - [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
+- [terraform_data.ad_creation_provisioner](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/resources/data) (resource)
+- [terraform_data.replacement](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/resources/data) (resource)
 - [azurerm_client_config.telemetry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 - [modtm_module_source.telemetry](https://registry.terraform.io/providers/azure/modtm/latest/docs/data-sources/module_source) (data source)
 
@@ -58,6 +52,48 @@ The following resources are used by this module:
 ## Required Inputs
 
 The following input variables are required:
+
+### <a name="input_adou_path"></a> [adou\_path](#input\_adou\_path)
+
+Description: The Active Directory OU path.
+
+Type: `string`
+
+### <a name="input_deployment_user"></a> [deployment\_user](#input\_deployment\_user)
+
+Description: The username for deployment user.
+
+Type: `string`
+
+### <a name="input_deployment_user_password"></a> [deployment\_user\_password](#input\_deployment\_user\_password)
+
+Description: The password for deployment user.
+
+Type: `string`
+
+### <a name="input_domain_admin_password"></a> [domain\_admin\_password](#input\_domain\_admin\_password)
+
+Description: The password for the domain administrator account.
+
+Type: `string`
+
+### <a name="input_domain_admin_user"></a> [domain\_admin\_user](#input\_domain\_admin\_user)
+
+Description: The username for the domain administrator account.
+
+Type: `string`
+
+### <a name="input_domain_fqdn"></a> [domain\_fqdn](#input\_domain\_fqdn)
+
+Description: The domain FQDN.
+
+Type: `string`
+
+### <a name="input_domain_server_ip"></a> [domain\_server\_ip](#input\_domain\_server\_ip)
+
+Description: The ip of the domain server.
+
+Type: `string`
 
 ### <a name="input_location"></a> [location](#input\_location)
 
@@ -80,6 +116,14 @@ Type: `string`
 ## Optional Inputs
 
 The following input variables are optional (have default values):
+
+### <a name="input_authentication_method"></a> [authentication\_method](#input\_authentication\_method)
+
+Description: The authentication method for Enter-PSSession.
+
+Type: `string`
+
+Default: `"Default"`
 
 ### <a name="input_customer_managed_key"></a> [customer\_managed\_key](#input\_customer\_managed\_key)
 
@@ -104,6 +148,22 @@ object({
 ```
 
 Default: `null`
+
+### <a name="input_dc_port"></a> [dc\_port](#input\_dc\_port)
+
+Description: Domain controller winrm port in virtual host
+
+Type: `number`
+
+Default: `5985`
+
+### <a name="input_destory_adou"></a> [destory\_adou](#input\_destory\_adou)
+
+Description: whether destroy previous adou
+
+Type: `bool`
+
+Default: `false`
 
 ### <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings)
 
@@ -285,6 +345,14 @@ Description: (Optional) Tags of the resource.
 Type: `map(string)`
 
 Default: `null`
+
+### <a name="input_virtual_host_ip"></a> [virtual\_host\_ip](#input\_virtual\_host\_ip)
+
+Description: The virtual host IP address.
+
+Type: `string`
+
+Default: `""`
 
 ## Outputs
 

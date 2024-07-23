@@ -48,7 +48,7 @@ module "naming" {
 }
 
 # This is required for resource modules
-resource "azurerm_resource_group" "this" {
+resource "azurerm_resource_group" "rg" {
   location = module.regions.regions[random_integer.region_index.result].name
   name     = module.naming.resource_group.name_unique
 }
@@ -61,11 +61,23 @@ module "test" {
   source = "../../"
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
   # ...
-  location            = azurerm_resource_group.this.location
+  location            = azurerm_resource_group.rg.location
   name                = "TODO" # TODO update with module.naming.<RESOURCE_TYPE>.name_unique
-  resource_group_name = azurerm_resource_group.this.name
+  resource_group_name = azurerm_resource_group.rg.name
 
   enable_telemetry = var.enable_telemetry # see variables.tf
+  // Beginning of specific varible for virtual environment
+  dc_port         = 6985
+  virtual_host_ip = var.private_ip
+
+  authentication_method    = "Credssp"
+  domain_fqdn              = "jumpstart.local"
+  deployment_user_password = var.deployment_user_password
+  domain_admin_user        = var.domain_admin_user
+  domain_admin_password    = var.domain_admin_password
+  deployment_user          = local.deployment_user
+  domain_server_ip         = "192.168.1.254"
+  adou_path                = local.adou_path
 }
 ```
 
@@ -82,29 +94,65 @@ The following requirements are needed by this module:
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.5)
 
-## Providers
-
-The following providers are used by this module:
-
-- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (~> 3.74)
-
-- <a name="provider_random"></a> [random](#provider\_random) (~> 3.5)
-
 ## Resources
 
 The following resources are used by this module:
 
-- [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
+- [azurerm_resource_group.rg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
 - [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
 
-No required inputs.
+The following input variables are required:
+
+### <a name="input_deployment_user_password"></a> [deployment\_user\_password](#input\_deployment\_user\_password)
+
+Description: The password for deployment user.
+
+Type: `string`
+
+### <a name="input_domain_admin_password"></a> [domain\_admin\_password](#input\_domain\_admin\_password)
+
+Description: The password of the domain account.
+
+Type: `string`
+
+### <a name="input_domain_admin_user"></a> [domain\_admin\_user](#input\_domain\_admin\_user)
+
+Description: The username of the domain account.
+
+Type: `string`
+
+### <a name="input_local_admin_password"></a> [local\_admin\_password](#input\_local\_admin\_password)
+
+Description: The password of the local administrator account.
+
+Type: `string`
+
+### <a name="input_private_ip"></a> [private\_ip](#input\_private\_ip)
+
+Description: value of private ip
+
+Type: `string`
+
+### <a name="input_runnumber"></a> [runnumber](#input\_runnumber)
+
+Description: The run number
+
+Type: `string`
 
 ## Optional Inputs
 
 The following input variables are optional (have default values):
+
+### <a name="input_adou_suffix"></a> [adou\_suffix](#input\_adou\_suffix)
+
+Description: The suffix of Active Directory OU path.
+
+Type: `string`
+
+Default: `"DC=jumpstart,DC=local"`
 
 ### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
 

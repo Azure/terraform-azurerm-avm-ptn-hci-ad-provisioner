@@ -52,7 +52,7 @@ resource "azurerm_resource_group" "rg" {
 # Leaving location as `null` will cause the module to use the resource group location
 # with a data source.
 module "test" {
- source = "../../"
+  source = "../../"
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
   # ...
   location            = azurerm_resource_group.rg.location
@@ -61,7 +61,7 @@ module "test" {
 
   enable_telemetry = var.enable_telemetry # see variables.tf
   // Beginning of specific varible for virtual environment
-  dc_port = 6985
+  dc_port         = 6985
   virtual_host_ip = var.private_ip
 
   authentication_method    = "Credssp"
@@ -69,7 +69,7 @@ module "test" {
   deployment_user_password = var.deployment_user_password
   domain_admin_user        = var.domain_admin_user
   domain_admin_password    = var.domain_admin_password
-  deployment_user       = local.deployment_user
-  domain_server_ip      = "192.168.1.254"
-  adou_path             = local.adou_path
+  deployment_user          = local.deployment_user
+  domain_server_ip         = "192.168.1.254"
+  adou_path                = local.adou_path
 }
