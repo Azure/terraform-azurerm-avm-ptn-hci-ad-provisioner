@@ -42,7 +42,7 @@ module "naming" {
 }
 
 # This is required for resource modules
-resource "azurerm_resource_group" "this" {
+resource "azurerm_resource_group" "rg" {
   location = module.regions.regions[random_integer.region_index.result].name
   name     = module.naming.resource_group.name_unique
 }
@@ -52,12 +52,24 @@ resource "azurerm_resource_group" "this" {
 # Leaving location as `null` will cause the module to use the resource group location
 # with a data source.
 module "test" {
-  source = "../../"
+ source = "../../"
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
   # ...
-  location            = azurerm_resource_group.this.location
+  location            = azurerm_resource_group.rg.location
   name                = "TODO" # TODO update with module.naming.<RESOURCE_TYPE>.name_unique
-  resource_group_name = azurerm_resource_group.this.name
+  resource_group_name = azurerm_resource_group.rg.name
 
   enable_telemetry = var.enable_telemetry # see variables.tf
+  // Beginning of specific varible for virtual environment
+  dc_port = 6985
+  virtual_host_ip = var.private_ip
+
+  authentication_method    = "Credssp"
+  domain_fqdn              = "jumpstart.local"
+  deployment_user_password = var.deployment_user_password
+  domain_admin_user        = var.domain_admin_user
+  domain_admin_password    = var.domain_admin_password
+  deployment_user       = local.deployment_user
+  domain_server_ip      = "192.168.1.254"
+  adou_path             = local.adou_path
 }

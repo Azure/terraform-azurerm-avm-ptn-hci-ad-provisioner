@@ -232,3 +232,74 @@ variable "tags" {
   default     = null
   description = "(Optional) Tags of the resource."
 }
+
+# Virtual host related variables
+variable "virtual_host_ip" {
+  type        = string
+  default     = ""
+  description = "The virtual host IP address."
+}
+
+variable "domain_server_ip" {
+  type        = string
+  description = "The ip of the domain server."
+}
+
+variable "domain_admin_user" {
+  type        = string
+  description = "The username for the domain administrator account."
+}
+
+variable "domain_admin_password" {
+  type        = string
+  description = "The password for the domain administrator account."
+}
+
+variable "authentication_method" {
+  type        = string
+  default     = "Default"
+  description = "The authentication method for Enter-PSSession."
+
+  validation {
+    condition     = can(regex("^(Default|Basic|Negotiate|NegotiateWithImplicitCredential|Credssp|Digest|Kerberos)$", var.authentication_method))
+    error_message = "Value of authentication_method should be {Default | Basic | Negotiate | NegotiateWithImplicitCredential | Credssp | Digest | Kerberos}"
+  }
+}
+
+variable "dc_port" {
+  type        = number
+  default     = 5985
+  description = "Domain controller winrm port in virtual host"
+}
+
+variable "adou_path" {
+  type        = string
+  description = "The Active Directory OU path."
+}
+
+variable "destory_adou" {
+  type        = bool
+  default     = false
+  description = "whether destroy previous adou"
+}
+
+variable "deployment_user" {
+  type        = string
+  description = "The username for deployment user."
+
+  validation {
+    condition     = length(var.deployment_user) < 21 && length(var.deployment_user) > 0 && can(regex("^[a-zA-Z_][a-zA-Z0-9_-]*$", var.deployment_user))
+    error_message = "Username must be between 1 to 20 characters and only contain letters, numbers, hyphens, and underscores and may not start with a hyphen or number."
+    # 20 character limit for sAMAccountName in ad preparation New-ADUser.
+  }
+}
+
+variable "deployment_user_password" {
+  type        = string
+  description = "The password for deployment user."
+}
+
+variable "domain_fqdn" {
+  type        = string
+  description = "The domain FQDN."
+}
