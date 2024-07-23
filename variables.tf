@@ -39,17 +39,6 @@ variable "domain_server_ip" {
   description = "The ip of the domain server."
 }
 
-variable "location" {
-  type        = string
-  description = "Azure region where the resource should be deployed."
-  nullable    = false
-}
-
-variable "name" {
-  type        = string
-  description = "The name of the this resource."
-}
-
 # This is required for most resource modules
 variable "resource_group_name" {
   type        = string
@@ -157,6 +146,7 @@ variable "role_assignments" {
     condition                              = optional(string, null)
     condition_version                      = optional(string, null)
     delegated_managed_identity_resource_id = optional(string, null)
+    principal_type                         = optional(string, null)
   }))
   default     = {}
   description = <<DESCRIPTION

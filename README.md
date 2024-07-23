@@ -92,18 +92,6 @@ Description: The ip of the domain server.
 
 Type: `string`
 
-### <a name="input_location"></a> [location](#input\_location)
-
-Description: Azure region where the resource should be deployed.
-
-Type: `string`
-
-### <a name="input_name"></a> [name](#input\_name)
-
-Description: The name of the this resource.
-
-Type: `string`
-
 ### <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name)
 
 Description: The resource group where the resources will be deployed.
@@ -232,6 +220,7 @@ map(object({
     condition                              = optional(string, null)
     condition_version                      = optional(string, null)
     delegated_managed_identity_resource_id = optional(string, null)
+    principal_type                         = optional(string, null)
   }))
 ```
 
