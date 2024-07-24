@@ -42,9 +42,8 @@ module "naming" {
 }
 
 # This is required for resource modules
-resource "azurerm_resource_group" "rg" {
-  location = "eastus"
-  name     = local.resource_group_name
+data "azurerm_resource_group" "rg" {
+  name = local.resource_group_name
 }
 
 # This is the module call

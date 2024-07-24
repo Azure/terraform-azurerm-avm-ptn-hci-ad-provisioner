@@ -48,9 +48,8 @@ module "naming" {
 }
 
 # This is required for resource modules
-resource "azurerm_resource_group" "rg" {
-  location = "eastus"
-  name     = local.resource_group_name
+data "azurerm_resource_group" "rg" {
+  name = local.resource_group_name
 }
 
 # This is the module call
@@ -94,8 +93,8 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
-- [azurerm_resource_group.rg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
 - [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
+- [azurerm_resource_group.rg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
