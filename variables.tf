@@ -3,6 +3,11 @@ variable "adou_path" {
   description = "The Active Directory OU path."
 }
 
+variable "dc_ip" {
+  type        = string
+  description = "The ip of the server."
+}
+
 variable "deployment_user" {
   type        = string
   description = "The username for deployment user."
@@ -32,11 +37,6 @@ variable "domain_admin_user" {
 variable "domain_fqdn" {
   type        = string
   description = "The domain FQDN."
-}
-
-variable "domain_server_ip" {
-  type        = string
-  description = "The ip of the domain server."
 }
 
 # This is required for most resource modules
@@ -169,11 +169,4 @@ variable "tags" {
   type        = map(string)
   default     = null
   description = "(Optional) Tags of the resource."
-}
-
-# Virtual host related variables
-variable "virtual_host_ip" {
-  type        = string
-  default     = ""
-  description = "The virtual host IP address."
 }

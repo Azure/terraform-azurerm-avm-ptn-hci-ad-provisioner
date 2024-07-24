@@ -43,7 +43,7 @@ module "naming" {
 
 # This is required for resource modules
 data "azurerm_resource_group" "rg" {
-  name = local.resource_group_name
+  name = var.resource_group_name
 }
 
 # This is the module call
@@ -58,15 +58,13 @@ module "test" {
 
   enable_telemetry = var.enable_telemetry # see variables.tf
   # Beginning of specific varible for virtual environment
-  dc_port         = 6985
-  virtual_host_ip = var.private_ip
-
+  dc_port                  = 6985
+  dc_ip                    = var.dc_ip
   authentication_method    = "Credssp"
   domain_fqdn              = "jumpstart.local"
   deployment_user_password = var.deployment_user_password
   domain_admin_user        = var.domain_admin_user
   domain_admin_password    = var.domain_admin_password
-  deployment_user          = local.deployment_user
-  domain_server_ip         = "192.168.1.254"
+  deployment_user          = var.deployment_user
   adou_path                = local.adou_path
 }

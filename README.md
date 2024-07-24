@@ -20,8 +20,6 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
-- [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
-- [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/azure/modtm/latest/docs/resources/telemetry) (resource)
 - [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
 - [terraform_data.ad_creation_provisioner](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/resources/data) (resource)
@@ -37,6 +35,12 @@ The following input variables are required:
 ### <a name="input_adou_path"></a> [adou\_path](#input\_adou\_path)
 
 Description: The Active Directory OU path.
+
+Type: `string`
+
+### <a name="input_dc_ip"></a> [dc\_ip](#input\_dc\_ip)
+
+Description: The ip of the server.
 
 Type: `string`
 
@@ -67,12 +71,6 @@ Type: `string`
 ### <a name="input_domain_fqdn"></a> [domain\_fqdn](#input\_domain\_fqdn)
 
 Description: The domain FQDN.
-
-Type: `string`
-
-### <a name="input_domain_server_ip"></a> [domain\_server\_ip](#input\_domain\_server\_ip)
-
-Description: The ip of the domain server.
 
 Type: `string`
 
@@ -217,14 +215,6 @@ Description: (Optional) Tags of the resource.
 Type: `map(string)`
 
 Default: `null`
-
-### <a name="input_virtual_host_ip"></a> [virtual\_host\_ip](#input\_virtual\_host\_ip)
-
-Description: The virtual host IP address.
-
-Type: `string`
-
-Default: `""`
 
 ## Outputs
 
