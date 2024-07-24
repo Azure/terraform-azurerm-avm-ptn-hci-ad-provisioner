@@ -5,10 +5,6 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 3.74"
     }
-    modtm = {
-      source  = "azure/modtm"
-      version = "~> 0.3"
-    }
     random = {
       source  = "hashicorp/random"
       version = "~> 3.5"
@@ -17,7 +13,11 @@ terraform {
 }
 
 provider "azurerm" {
-  features {}
+  features {
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
+  }
 }
 
 
@@ -42,9 +42,8 @@ module "naming" {
 }
 
 # This is required for resource modules
-resource "azurerm_resource_group" "this" {
-  location = module.regions.regions[random_integer.region_index.result].name
-  name     = module.naming.resource_group.name_unique
+data "azurerm_resource_group" "rg" {
+  name = local.resource_group_name
 }
 
 # This is the module call
@@ -55,9 +54,19 @@ module "test" {
   source = "../../"
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
   # ...
-  location            = azurerm_resource_group.this.location
-  name                = "TODO" # TODO update with module.naming.<RESOURCE_TYPE>.name_unique
-  resource_group_name = azurerm_resource_group.this.name
+  resource_group_name = azurerm_resource_group.rg.name
 
   enable_telemetry = var.enable_telemetry # see variables.tf
+  # Beginning of specific varible for virtual environment
+  dc_port         = 6985
+  virtual_host_ip = var.private_ip
+
+  authentication_method    = "Credssp"
+  domain_fqdn              = "jumpstart.local"
+  deployment_user_password = var.deployment_user_password
+  domain_admin_user        = var.domain_admin_user
+  domain_admin_password    = var.domain_admin_password
+  deployment_user          = local.deployment_user
+  domain_server_ip         = "192.168.1.254"
+  adou_path                = local.adou_path
 }
