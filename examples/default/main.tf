@@ -54,7 +54,7 @@ module "test" {
   source = "../../"
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
   # ...
-  resource_group_name = azurerm_resource_group.rg.name
+  resource_group_name = data.azurerm_resource_group.rg.name
 
   enable_telemetry = var.enable_telemetry # see variables.tf
   # Beginning of specific varible for virtual environment
