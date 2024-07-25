@@ -6,13 +6,11 @@ variable "dc_ip" {
 variable "deployment_user_password" {
   type        = string
   description = "The password for deployment user."
-  sensitive   = true
 }
 
 variable "domain_admin_password" {
   type        = string
   description = "The password of the domain account."
-  sensitive   = true
 }
 
 variable "domain_admin_user" {

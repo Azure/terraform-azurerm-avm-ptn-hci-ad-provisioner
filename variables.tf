@@ -22,13 +22,11 @@ variable "deployment_user" {
 variable "deployment_user_password" {
   type        = string
   description = "The password for deployment user."
-  sensitive   = true
 }
 
 variable "domain_admin_password" {
   type        = string
   description = "The password for the domain administrator account."
-  sensitive   = true
 }
 
 variable "domain_admin_user" {
