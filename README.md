@@ -1,5 +1,5 @@
 <!-- BEGIN_TF_DOCS -->
-# terraform-azapi-avm-ptn-hci-ad-provisioner
+# terraform-azurerm-avm-ptn-hci-ad-provisioner
 
 Module to provision azure stack hci ad.
 
