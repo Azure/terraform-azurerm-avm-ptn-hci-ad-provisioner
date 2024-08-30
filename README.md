@@ -1,16 +1,7 @@
 <!-- BEGIN_TF_DOCS -->
-# terraform-azurerm-avm-template
+# terraform-azurerm-avm-ptn-hci-ad-provisioner
 
-This is a template repo for Terraform Azure Verified Modules.
-
-Things to do:
-
-1. Set up a GitHub repo environment called `test`.
-1. Configure environment protection rule to ensure that approval is required before deploying to this environment.
-1. Create a user-assigned managed identity in your test subscription.
-1. Create a role assignment for the managed identity on your test subscription, use the minimum required role.
-1. Configure federated identity credentials on the user assigned managed identity. Use the GitHub environment.
-1. Search and update TODOs within the code and remove the TODO comments once complete.
+Module to provision azure stack hci ad.
 
 > [!IMPORTANT]
 > As the overall AVM framework is not GA (generally available) yet - the CI framework and test automation is not fully functional and implemented across all supported languages yet - breaking changes are expected, and additional customer feedback is yet to be gathered and incorporated. Hence, modules **MUST NOT** be published at version `1.0.0` or higher at this time.
@@ -36,8 +27,6 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
-- [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
-- [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/azure/modtm/latest/docs/resources/telemetry) (resource)
 - [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
 - [terraform_data.ad_creation_provisioner](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/resources/data) (resource)
@@ -53,6 +42,12 @@ The following input variables are required:
 ### <a name="input_adou_path"></a> [adou\_path](#input\_adou\_path)
 
 Description: The Active Directory OU path.
+
+Type: `string`
+
+### <a name="input_dc_ip"></a> [dc\_ip](#input\_dc\_ip)
+
+Description: The ip of the server.
 
 Type: `string`
 
@@ -86,12 +81,6 @@ Description: The domain FQDN.
 
 Type: `string`
 
-### <a name="input_domain_server_ip"></a> [domain\_server\_ip](#input\_domain\_server\_ip)
-
-Description: The ip of the domain server.
-
-Type: `string`
-
 ### <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name)
 
 Description: The resource group where the resources will be deployed.
@@ -109,30 +98,6 @@ Description: The authentication method for Enter-PSSession.
 Type: `string`
 
 Default: `"Default"`
-
-### <a name="input_customer_managed_key"></a> [customer\_managed\_key](#input\_customer\_managed\_key)
-
-Description: A map describing customer-managed keys to associate with the resource. This includes the following properties:
-- `key_vault_resource_id` - The resource ID of the Key Vault where the key is stored.
-- `key_name` - The name of the key.
-- `key_version` - (Optional) The version of the key. If not specified, the latest version is used.
-- `user_assigned_identity` - (Optional) An object representing a user-assigned identity with the following properties:
-  - `resource_id` - The resource ID of the user-assigned identity.
-
-Type:
-
-```hcl
-object({
-    key_vault_resource_id = string
-    key_name              = string
-    key_version           = optional(string, null)
-    user_assigned_identity = optional(object({
-      resource_id = string
-    }), null)
-  })
-```
-
-Default: `null`
 
 ### <a name="input_dc_port"></a> [dc\_port](#input\_dc\_port)
 
@@ -159,88 +124,6 @@ If it is set to false, then no telemetry will be collected.
 Type: `bool`
 
 Default: `true`
-
-### <a name="input_lock"></a> [lock](#input\_lock)
-
-Description: Controls the Resource Lock configuration for this resource. The following properties can be specified:
-
-- `kind` - (Required) The type of lock. Possible values are `\"CanNotDelete\"` and `\"ReadOnly\"`.
-- `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
-
-Type:
-
-```hcl
-object({
-    kind = string
-    name = optional(string, null)
-  })
-```
-
-Default: `null`
-
-### <a name="input_managed_identities"></a> [managed\_identities](#input\_managed\_identities)
-
-Description: Controls the Managed Identity configuration on this resource. The following properties can be specified:
-
-- `system_assigned` - (Optional) Specifies if the System Assigned Managed Identity should be enabled.
-- `user_assigned_resource_ids` - (Optional) Specifies a list of User Assigned Managed Identity resource IDs to be assigned to this resource.
-
-Type:
-
-```hcl
-object({
-    system_assigned            = optional(bool, false)
-    user_assigned_resource_ids = optional(set(string), [])
-  })
-```
-
-Default: `{}`
-
-### <a name="input_role_assignments"></a> [role\_assignments](#input\_role\_assignments)
-
-Description: A map of role assignments to create on this resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-
-- `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.
-- `principal_id` - The ID of the principal to assign the role to.
-- `description` - The description of the role assignment.
-- `skip_service_principal_aad_check` - If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false.
-- `condition` - The condition which will be used to scope the role assignment.
-- `condition_version` - The version of the condition syntax. Valid values are '2.0'.
-
-> Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
-
-Type:
-
-```hcl
-map(object({
-    role_definition_id_or_name             = string
-    principal_id                           = string
-    description                            = optional(string, null)
-    skip_service_principal_aad_check       = optional(bool, false)
-    condition                              = optional(string, null)
-    condition_version                      = optional(string, null)
-    delegated_managed_identity_resource_id = optional(string, null)
-    principal_type                         = optional(string, null)
-  }))
-```
-
-Default: `{}`
-
-### <a name="input_tags"></a> [tags](#input\_tags)
-
-Description: (Optional) Tags of the resource.
-
-Type: `map(string)`
-
-Default: `null`
-
-### <a name="input_virtual_host_ip"></a> [virtual\_host\_ip](#input\_virtual\_host\_ip)
-
-Description: The virtual host IP address.
-
-Type: `string`
-
-Default: `""`
 
 ## Outputs
 

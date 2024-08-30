@@ -49,7 +49,7 @@ module "naming" {
 
 # This is required for resource modules
 data "azurerm_resource_group" "rg" {
-  name = local.resource_group_name
+  name = var.resource_group_name
 }
 
 # This is the module call
@@ -58,22 +58,20 @@ data "azurerm_resource_group" "rg" {
 # with a data source.
 module "test" {
   source = "../../"
-  # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
+  # source             = "Azure/avm-ptn-hci-ad-provisioner/azurerm"
   # ...
-  resource_group_name = azurerm_resource_group.rg.name
+  resource_group_name = data.azurerm_resource_group.rg.name
 
   enable_telemetry = var.enable_telemetry # see variables.tf
   # Beginning of specific varible for virtual environment
-  dc_port         = 6985
-  virtual_host_ip = var.private_ip
-
+  dc_port                  = 6985
+  dc_ip                    = var.dc_ip
   authentication_method    = "Credssp"
   domain_fqdn              = "jumpstart.local"
   deployment_user_password = var.deployment_user_password
   domain_admin_user        = var.domain_admin_user
   domain_admin_password    = var.domain_admin_password
-  deployment_user          = local.deployment_user
-  domain_server_ip         = "192.168.1.254"
+  deployment_user          = var.deployment_user
   adou_path                = local.adou_path
 }
 ```
@@ -101,6 +99,12 @@ The following resources are used by this module:
 
 The following input variables are required:
 
+### <a name="input_dc_ip"></a> [dc\_ip](#input\_dc\_ip)
+
+Description: The ip of the server.
+
+Type: `string`
+
 ### <a name="input_deployment_user_password"></a> [deployment\_user\_password](#input\_deployment\_user\_password)
 
 Description: The password for deployment user.
@@ -119,15 +123,9 @@ Description: The username of the domain account.
 
 Type: `string`
 
-### <a name="input_private_ip"></a> [private\_ip](#input\_private\_ip)
+### <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name)
 
-Description: value of private ip
-
-Type: `string`
-
-### <a name="input_runnumber"></a> [runnumber](#input\_runnumber)
-
-Description: The run number
+Description: The resource group where the resources will be deployed.
 
 Type: `string`
 
@@ -142,6 +140,14 @@ Description: The suffix of Active Directory OU path.
 Type: `string`
 
 Default: `"DC=jumpstart,DC=local"`
+
+### <a name="input_deployment_user"></a> [deployment\_user](#input\_deployment\_user)
+
+Description: The username for deployment user.
+
+Type: `string`
+
+Default: `"avmdeploy"`
 
 ### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
 

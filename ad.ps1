@@ -1,7 +1,7 @@
 param(
-    $userName,
+    $user_name,
     $password,
-    $authType,
+    $auth_type,
     $adou_path,
     $ip, $port,
     $domain_fqdn,
@@ -17,9 +17,9 @@ for ($count = 0; $count -lt 3; $count++) {
     try {
         $secpasswd = ConvertTo-SecureString $password -AsPlainText -Force
         $domainShort = $domain_fqdn.Split(".")[0]
-        $cred = New-Object System.Management.Automation.PSCredential -ArgumentList "$domainShort\$username", $secpasswd
+        $cred = New-Object System.Management.Automation.PSCredential -ArgumentList "$domainShort\$user_name", $secpasswd
         
-        if ($authType -eq "CredSSP") {
+        if ($auth_type -eq "CredSSP") {
             try {
                 Enable-WSManCredSSP -Role Client -DelegateComputer $ip -Force
             }
@@ -28,7 +28,7 @@ for ($count = 0; $count -lt 3; $count++) {
             }
         }
         
-        $session = New-PSSession -ComputerName $ip -Port $port -Authentication $authType -Credential $cred
+        $session = New-PSSession -ComputerName $ip -Port $port -Authentication $auth_type -Credential $cred
         if ($ifdeleteadou) {
             Invoke-Command -Session $session -ScriptBlock {
                 $OUPrefixList = @("OU=Computers,", "OU=Users,", "")

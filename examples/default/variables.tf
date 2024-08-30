@@ -1,11 +1,18 @@
+variable "dc_ip" {
+  type        = string
+  description = "The ip of the server."
+}
+
 variable "deployment_user_password" {
   type        = string
   description = "The password for deployment user."
+  sensitive   = true
 }
 
 variable "domain_admin_password" {
   type        = string
   description = "The password of the domain account."
+  sensitive   = true
 }
 
 variable "domain_admin_user" {
@@ -13,20 +20,21 @@ variable "domain_admin_user" {
   description = "The username of the domain account."
 }
 
-variable "private_ip" {
+variable "resource_group_name" {
   type        = string
-  description = "value of private ip"
-}
-
-variable "runnumber" {
-  type        = string
-  description = "The run number"
+  description = "The resource group where the resources will be deployed."
 }
 
 variable "adou_suffix" {
   type        = string
   default     = "DC=jumpstart,DC=local"
   description = "The suffix of Active Directory OU path."
+}
+
+variable "deployment_user" {
+  type        = string
+  default     = "avmdeploy"
+  description = "The username for deployment user."
 }
 
 variable "enable_telemetry" {
