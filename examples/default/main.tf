@@ -52,7 +52,7 @@ data "azurerm_resource_group" "rg" {
 # with a data source.
 module "test" {
   source = "../../"
-  # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
+  # source             = "Azure/avm-ptn-hci-ad-provisioner/azurerm"
   # ...
   resource_group_name = data.azurerm_resource_group.rg.name
 
