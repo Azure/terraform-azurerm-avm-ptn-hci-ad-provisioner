@@ -1,14 +1,54 @@
 param(
-    $user_name,
+    $userName,
     $password,
-    $auth_type,
-    $adou_path,
+    $authType,
+    $adouPath,
     $ip, $port,
-    $domain_fqdn,
+    $domainFqdn,
     $ifdeleteadou,
-    $deployment_user,
-    $deployment_user_password
+    $deploymentUser,
+    $deploymentUserPassword
 )
+
+if ($authType -eq "CredSSP") {
+  try {
+      echo "set trusted hosts"
+      Set-Item wsman:localhost\client\trustedhosts -value * -Force
+      echo "enable client CredSSP"
+      Enable-WSManCredSSP -Role Client -DelegateComputer * -Force
+
+      echo "Allow fresh credentials"
+      $key = 'hklm:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation'
+      if (!(Test-Path $key)) {
+          md $key
+      }
+      New-ItemProperty -Path $key -Name AllowFreshCredentials -Value 1 -PropertyType Dword -Force            
+
+      $allowFreshCredentialsKey = Join-Path $key 'AllowFreshCredentials'
+      if (!(Test-Path $allowFreshCredentialsKey)) {
+          md $allowFreshCredentialsKey
+      }
+
+      if (!(Get-ItemProperty -Path $allowFreshCredentialsKey -Name 'AzureArcIaCAutomation' -ErrorAction SilentlyContinue)) {
+          New-ItemProperty -Path $allowFreshCredentialsKey -Name 'AzureArcIaCAutomation' -Value 'WSMAN/*' -PropertyType String -Force
+      }
+
+      echo "Allow fresh credentials when NTLM only"
+      New-ItemProperty -Path $key -Name AllowFreshCredentialsWhenNTLMOnly -Value 1 -PropertyType Dword -Force
+
+      $allowFreshCredentialsWhenNTLMOnlyKey = Join-Path $key 'AllowFreshCredentialsWhenNTLMOnly'
+      if (!(Test-Path $allowFreshCredentialsWhenNTLMOnlyKey)) {
+          md $allowFreshCredentialsWhenNTLMOnlyKey
+      }
+
+      if (!(Get-ItemProperty -Path $allowFreshCredentialsWhenNTLMOnlyKey -Name 1 -ErrorAction SilentlyContinue)) {
+          New-ItemProperty -Path $allowFreshCredentialsWhenNTLMOnlyKey -Name 1 -Value 'WSMAN/*' -PropertyType String -Force
+      }
+  }
+  catch {
+      echo "Enable-WSManCredSSP failed: $_"
+  }
+}
 
 $script:ErrorActionPreference = 'Stop'
 $count = 0
@@ -16,10 +56,10 @@ $count = 0
 for ($count = 0; $count -lt 3; $count++) {
     try {
         $secpasswd = ConvertTo-SecureString $password -AsPlainText -Force
-        $domainShort = $domain_fqdn.Split(".")[0]
-        $cred = New-Object System.Management.Automation.PSCredential -ArgumentList "$domainShort\$user_name", $secpasswd
+        $domainShort = $domainFqdn.Split(".")[0]
+        $cred = New-Object System.Management.Automation.PSCredential -ArgumentList "$domainShort\$userName", $secpasswd
         
-        if ($auth_type -eq "CredSSP") {
+        if ($authType -eq "CredSSP") {
             try {
                 Enable-WSManCredSSP -Role Client -DelegateComputer $ip -Force
             }
@@ -28,12 +68,12 @@ for ($count = 0; $count -lt 3; $count++) {
             }
         }
         
-        $session = New-PSSession -ComputerName $ip -Port $port -Authentication $auth_type -Credential $cred
+        $session = New-PSSession -ComputerName $ip -Port $port -Authentication $authType -Credential $cred
         if ($ifdeleteadou) {
             Invoke-Command -Session $session -ScriptBlock {
                 $OUPrefixList = @("OU=Computers,", "OU=Users,", "")
                 foreach ($prefix in $OUPrefixList) {
-                    $ouname = "$prefix$Using:adou_path"
+                    $ouname = "$prefix$Using:adouPath"
                     echo "try to get OU: $ouname"
                     Try {
                         $ou = Get-ADOrganizationalUnit -Identity $ouname
@@ -50,8 +90,8 @@ for ($count = 0; $count -lt 3; $count++) {
             }
             
         }
-        $deploymentSecPasswd = ConvertTo-SecureString $deployment_user_password -AsPlainText -Force
-        $lcmCred = New-Object System.Management.Automation.PSCredential -ArgumentList $deployment_user, $deploymentSecPasswd
+        $deploymentSecPasswd = ConvertTo-SecureString $deploymentUserPassword -AsPlainText -Force
+        $lcmCred = New-Object System.Management.Automation.PSCredential -ArgumentList $deploymentUser, $deploymentSecPasswd
         Invoke-Command -Session $session -ScriptBlock {
             echo "Install Nuget Provider"
             Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -Confirm:$false
@@ -60,7 +100,7 @@ for ($count = 0; $count -lt 3; $count++) {
             echo "Add KdsRootKey"
             Add-KdsRootKey -EffectiveTime ((Get-Date).addhours(-10))
             echo "New HciAdObjectsPreCreation"
-            New-HciAdObjectsPreCreation -AzureStackLCMUserCredential $Using:lcmCred -AsHciOUName $Using:adou_path
+            New-HciAdObjectsPreCreation -AzureStackLCMUserCredential $Using:lcmCred -AsHciOUName $Using:adouPath
         }
         break
     }
