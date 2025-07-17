@@ -6,6 +6,7 @@ This deploys the module in its simplest form.
 ```hcl
 terraform {
   required_version = "~> 1.5"
+
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
@@ -59,21 +60,21 @@ data "azurerm_resource_group" "rg" {
 # with a data source.
 module "test" {
   source = "../../"
+
+  adou_path                = local.adou_path
+  dc_ip                    = var.dc_ip
+  deployment_user          = var.deployment_user
+  deployment_user_password = var.deployment_user_password
+  domain_admin_password    = var.domain_admin_password
+  domain_admin_user        = var.domain_admin_user
+  domain_fqdn              = "jumpstart.local"
   # source             = "Azure/avm-ptn-hci-ad-provisioner/azurerm"
   # ...
-  resource_group_name = data.azurerm_resource_group.rg.name
-
-  enable_telemetry = var.enable_telemetry # see variables.tf
+  resource_group_name   = data.azurerm_resource_group.rg.name
+  authentication_method = "Credssp"
   # Beginning of specific varible for virtual environment
-  dc_port                  = 6985
-  dc_ip                    = var.dc_ip
-  authentication_method    = "Credssp"
-  domain_fqdn              = "jumpstart.local"
-  deployment_user_password = var.deployment_user_password
-  domain_admin_user        = var.domain_admin_user
-  domain_admin_password    = var.domain_admin_password
-  deployment_user          = var.deployment_user
-  adou_path                = local.adou_path
+  dc_port          = 6985
+  enable_telemetry = var.enable_telemetry # see variables.tf
 }
 ```
 
