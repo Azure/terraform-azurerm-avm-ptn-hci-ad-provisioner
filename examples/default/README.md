@@ -75,7 +75,7 @@ module "test" {
   authentication_method = "Credssp"
   # Beginning of specific varible for virtual environment
   dc_port          = 6985
-  enable_telemetry = false # see variables.tf
+  enable_telemetry = var.enable_telemetry # see variables.tf
 }
 ```
 
@@ -160,7 +160,7 @@ If it is set to false, then no telemetry will be collected.
 
 Type: `bool`
 
-Default: `true`
+Default: `false`
 
 ## Outputs
 
