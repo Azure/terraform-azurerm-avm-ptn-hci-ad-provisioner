@@ -14,7 +14,7 @@ terraform {
 }
 
 provider "azurerm" {
-  subscription_id = "0000000-0000-00000-000000"
+  subscription_id = local.subscription_id
   features {
     resource_group {
       prevent_deletion_if_contains_resources = false
@@ -26,7 +26,7 @@ provider "azurerm" {
 # This allows us to randomize the region for the resource group.
 module "regions" {
   source  = "Azure/regions/azurerm"
-  version = "~> 0.3"
+  version = "0.8.2"
 }
 
 # This allows us to randomize the region for the resource group.
@@ -39,19 +39,11 @@ resource "random_integer" "region_index" {
 
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
-  source  = "Azure/naming/azurerm"
-  version = "~> 0.3"
-}
-
-# This is required for resource modules
-data "azurerm_resource_group" "rg" {
-  name = var.resource_group_name
+  source  = "Azure/avm-utl-naming/azure"
+  version = "0.2.0"
 }
 
 # This is the module call
-# Do not specify location here due to the randomization above.
-# Leaving location as `null` will cause the module to use the resource group location
-# with a data source.
 module "test" {
   source = "../../"
 
@@ -64,9 +56,10 @@ module "test" {
   domain_fqdn              = "jumpstart.local"
   # source             = "Azure/avm-ptn-hci-ad-provisioner/azurerm"
   # ...
-  resource_group_name   = data.azurerm_resource_group.rg.name
+  resource_group_name   = local.resource_group_name
   authentication_method = "Credssp"
   # Beginning of specific varible for virtual environment
   dc_port          = 6985
   enable_telemetry = var.enable_telemetry # see variables.tf
+  location         = var.location
 }
