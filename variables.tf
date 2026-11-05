@@ -84,7 +84,7 @@ DESCRIPTION
 variable "location" {
   type        = string
   default     = null
-  description = "The Azure region for this module's telemetry deployment."
+  description = "The Azure region for this module's telemetry deployment. Required when enable_telemetry is true."
 
   validation {
     condition     = !var.enable_telemetry || var.location != null

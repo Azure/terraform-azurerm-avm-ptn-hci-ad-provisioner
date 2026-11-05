@@ -116,7 +116,7 @@ Default: `true`
 
 ### <a name="input_location"></a> [location](#input\_location)
 
-Description: The Azure region for this module's telemetry deployment.
+Description: The Azure region for this module's telemetry deployment. Required when enable\_telemetry is true.
 
 Type: `string`
 
