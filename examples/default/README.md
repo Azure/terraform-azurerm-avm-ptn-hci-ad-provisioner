@@ -67,8 +67,8 @@ resource "random_integer" "region_index" {
 
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
-  source  = "Azure/naming/azurerm"
-  version = "0.4.4"
+  source  = "Azure/avm-utl-naming/azure"
+  version = "0.2.0"
 }
 
 # This is required for resource modules
@@ -77,9 +77,6 @@ data "azurerm_resource_group" "rg" {
 }
 
 # This is the module call
-# Do not specify location here due to the randomization above.
-# Leaving location as `null` will cause the module to use the resource group location
-# with a data source.
 module "test" {
   source = "../../"
 
@@ -97,6 +94,7 @@ module "test" {
   # Beginning of specific varible for virtual environment
   dc_port          = 6985
   enable_telemetry = var.enable_telemetry # see variables.tf
+  location         = data.azurerm_resource_group.rg.location
 }
 ```
 
@@ -193,9 +191,9 @@ The following Modules are called:
 
 ### <a name="module_naming"></a> [naming](#module\_naming)
 
-Source: Azure/naming/azurerm
+Source: Azure/avm-utl-naming/azure
 
-Version: 0.4.4
+Version: 0.2.0
 
 ### <a name="module_regions"></a> [regions](#module\_regions)
 
