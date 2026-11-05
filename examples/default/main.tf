@@ -14,6 +14,7 @@ terraform {
 }
 
 provider "azurerm" {
+  subscription_id = local.subscription_id
   features {
     resource_group {
       prevent_deletion_if_contains_resources = false
@@ -42,11 +43,6 @@ module "naming" {
   version = "0.2.0"
 }
 
-# This is required for resource modules
-data "azurerm_resource_group" "rg" {
-  name = var.resource_group_name
-}
-
 # This is the module call
 module "test" {
   source = "../../"
@@ -60,10 +56,10 @@ module "test" {
   domain_fqdn              = "jumpstart.local"
   # source             = "Azure/avm-ptn-hci-ad-provisioner/azurerm"
   # ...
-  resource_group_name   = data.azurerm_resource_group.rg.name
+  resource_group_name   = local.resource_group_name
   authentication_method = "Credssp"
   # Beginning of specific varible for virtual environment
   dc_port          = 6985
   enable_telemetry = var.enable_telemetry # see variables.tf
-  location         = data.azurerm_resource_group.rg.location
+  location         = var.location
 }

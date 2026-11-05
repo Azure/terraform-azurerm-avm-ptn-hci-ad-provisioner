@@ -8,7 +8,7 @@ This example prepares Active Directory objects in an existing HCI lab. It does n
 
 Use an existing non-production `jumpstart.local` domain with a domain controller reachable over WinRM on port `6985` using CredSSP. Applying the example requires an approved Windows runner and a domain account authorized to prepare the HCI AD objects. The script changes the runner's WinRM/CredSSP settings and installs `AsHciADArtifactsPreCreationTool` on the domain controller from PowerShell Gallery.
 
-Authenticate to Azure with the approved identity and set `ARM_SUBSCRIPTION_ID` to the subscription containing the existing resource group. The identity must be able to read that group. Managed CI supplies its selected subscription through this environment variable; any `ARM_SUBSCRIPTION_ID_OVERRIDE` must belong to the permitted CI subscription pool.
+Authenticate to Azure with an approved identity for the subscription in the supplied resource group ID. Supply the group's actual region. The example does not look up or verify the group.
 
 ## Required lab inputs
 
@@ -20,11 +20,14 @@ Supply real fixture values through these exact Terraform environment names. Keep
 | `TF_VAR_deployment_user_password` | `TF_VAR_DEPLOYMENT_USER_PASSWORD` (secret) | Deployment-user password meeting the domain policy |
 | `TF_VAR_domain_admin_password` | `TF_VAR_DOMAIN_ADMIN_PASSWORD` (secret) | Password for the authorized domain account |
 | `TF_VAR_domain_admin_user` | `TF_VAR_DOMAIN_ADMIN_USER` | Authorized domain-account username |
-| `TF_VAR_resource_group_name` | `TF_VAR_RESOURCE_GROUP_NAME` | Existing resource group in the selected subscription |
+| `TF_VAR_resource_group_id` | `TF_VAR_RESOURCE_GROUP_ID` | Resource ID of the existing group in the lab subscription |
+| `TF_VAR_location` | `TF_VAR_LOCATION` | The existing group's Azure region |
 
-GitHub stores Actions setting names in uppercase, but Terraform input names are case-sensitive on Linux. The managed workflow exports stored names unchanged: explicitly map each setting above to its lowercase-suffix Terraform environment name in the process running `Avm.Authoring`. A per-example `pre.ps1` hook must instead write those exact names to `.env`, because its process environment is not inherited by Terraform.
+GitHub stores Actions setting names in uppercase, but Terraform input names are case-sensitive on Linux. For deployments, explicitly map each setting above to its lowercase-suffix Terraform environment name in the process running `Avm.Authoring`.
 
-No fixture values or input hook are provided by this example. Do not commit lab values or print passwords. The default deployment user is `avmdeploy`, and the AD OU path is `OU=<resource_group_name>,DC=jumpstart,DC=local`.
+For the managed PR-check policy plan only, `pre.ps1` supplies missing inputs using a synthetic group ID in the selected subscription, a region, and non-secret provisioner placeholders. Supplied values take precedence. The hook writes only inside the isolated policy stage and does not supply deployment inputs or create a group.
+
+Do not commit lab values or print passwords. The default deployment user is `avmdeploy`, and the AD OU path is `OU=<resource_group_name>,DC=jumpstart,DC=local`.
 
 ```hcl
 terraform {
@@ -43,6 +46,7 @@ terraform {
 }
 
 provider "azurerm" {
+  subscription_id = local.subscription_id
   features {
     resource_group {
       prevent_deletion_if_contains_resources = false
@@ -71,11 +75,6 @@ module "naming" {
   version = "0.2.0"
 }
 
-# This is required for resource modules
-data "azurerm_resource_group" "rg" {
-  name = var.resource_group_name
-}
-
 # This is the module call
 module "test" {
   source = "../../"
@@ -89,12 +88,12 @@ module "test" {
   domain_fqdn              = "jumpstart.local"
   # source             = "Azure/avm-ptn-hci-ad-provisioner/azurerm"
   # ...
-  resource_group_name   = data.azurerm_resource_group.rg.name
+  resource_group_name   = local.resource_group_name
   authentication_method = "Credssp"
   # Beginning of specific varible for virtual environment
   dc_port          = 6985
   enable_telemetry = var.enable_telemetry # see variables.tf
-  location         = data.azurerm_resource_group.rg.location
+  location         = var.location
 }
 ```
 
@@ -114,7 +113,6 @@ The following requirements are needed by this module:
 The following resources are used by this module:
 
 - [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
-- [azurerm_resource_group.rg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
@@ -145,9 +143,15 @@ Description: The username of the domain account.
 
 Type: `string`
 
-### <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name)
+### <a name="input_location"></a> [location](#input\_location)
 
-Description: The resource group where the resources will be deployed.
+Description: The Azure region for the existing resource group.
+
+Type: `string`
+
+### <a name="input_resource_group_id"></a> [resource\_group\_id](#input\_resource\_group\_id)
+
+Description: The resource ID of the existing resource group.
 
 Type: `string`
 
